@@ -19,7 +19,12 @@ export default function SettingsShell(props) {
       icon: KeyIcon,
       current: router.pathname == "/settings/password",
     },
-    { name: "Embed", href: "/settings/embed", icon: CodeIcon, current: router.pathname == "/settings/embed" },
+    {
+      name: "Embed & Webhooks",
+      href: "/settings/embed",
+      icon: CodeIcon,
+      current: router.pathname == "/settings/embed",
+    },
     {
       name: "Teams",
       href: "/settings/teams",
@@ -37,7 +42,7 @@ export default function SettingsShell(props) {
   return (
     <div>
       <div className="sm:mx-auto">
-        <nav className="-mb-px flex space-x-2 sm:space-x-8" aria-label="Tabs">
+        <nav className="flex -mb-px space-x-2 sm:space-x-8" aria-label="Tabs">
           {tabs.map((tab) => (
             <Link key={tab.name} href={tab.href}>
               <a
