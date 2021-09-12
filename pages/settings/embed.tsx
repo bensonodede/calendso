@@ -6,6 +6,7 @@ import { useSession } from "next-auth/client";
 import Loader from "@components/Loader";
 import { getSession } from "@lib/auth";
 import { Member } from "@lib/member";
+import Button from "@components/ui/Button";
 
 export default function Embed(props: { err: string | undefined; BASE_URL: string; user: Member }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -13,6 +14,23 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
   if (loading) {
     return <Loader />;
   }
+
+  const handleErrors = async (resp: Response) => {
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.message);
+    }
+    return resp.json();
+  };
+
+  const getWebhooks = () => {
+    fetch("/api/webhook")
+      .then(handleErrors)
+      .then((data) => {
+        console.log("success", data);
+      })
+      .catch(console.log);
+  };
 
   return (
     <Shell
@@ -38,7 +56,7 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
                     '<iframe src="' +
                     props.BASE_URL +
                     "/" +
-                    session.user.username +
+                    session?.user?.username +
                     '" frameborder="0" allowfullscreen></iframe>'
                   }
                   readOnly
@@ -58,7 +76,7 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
                     '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Schedule a meeting</title><style>body {margin: 0;}iframe {height: calc(100vh - 4px);width: calc(100vw - 4px);box-sizing: border-box;}</style></head><body><iframe src="' +
                     props.BASE_URL +
                     "/" +
-                    session.user.username +
+                    session?.user?.username +
                     '" frameborder="0" allowfullscreen></iframe></body></html>'
                   }
                   readOnly
@@ -75,6 +93,9 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
           <a href="https://developer.cal.com/api" className="btn btn-primary">
             Browse our API documentation
           </a>
+          <Button type="button" color="secondary" onClick={getWebhooks}>
+            GET WEBHOOKS
+          </Button>
         </div>
       </SettingsShell>
     </Shell>
@@ -89,7 +110,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const user = await prisma.user.findFirst({
     where: {
-      email: session.user.email,
+      email: session?.user?.email,
     },
     select: {
       id: true,
