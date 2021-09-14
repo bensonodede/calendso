@@ -11,7 +11,6 @@ import { useEffect, useState, useRef } from "react";
 import { PlusIcon, ShareIcon } from "@heroicons/react/outline";
 import WebhookList from "@components/webhook/WebhookList";
 import Checkbox from "@components/ui/form/checkbox";
-import { EventTypeCustomInputType } from ".prisma/client";
 
 export default function Embed(props: { err: string | undefined; BASE_URL: string; user: Member }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -21,12 +20,12 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
   const [bookingRescheduled, setBookingRescheduled] = useState(true);
   const [bookingCanceled, setBookingCanceled] = useState(true);
   const [webhooks, setWebhooks] = useState([]);
-  const [webhookEventTypes, setWebhookEventTypes] = useState([]);
   const [webhookEventTrigger, setWebhookEventTriggers] = useState([
     "BOOKING_CREATED",
     "BOOKING_RESCHEDULED",
     "BOOKING_CANCELED",
   ]);
+  const [webhookEventTypes, setWebhookEventTypes] = useState([]);
 
   const subUrlRef = useRef<HTMLInputElement>() as React.MutableRefObject<HTMLInputElement>;
 
@@ -62,23 +61,38 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
       .then(handleErrors)
       .then((data) => {
         setWebhooks(data.webhooks);
-        setWebhookEventTypes(
-          data.webhookEventTypes.map((eventType: { eventTypeId: number }) => eventType.eventTypeId)
-        );
-        console.log("success", data);
       })
       .catch(console.log);
   };
 
+  const getEventTypes = () => {
+    fetch("/api/eventType")
+      .then(handleErrors)
+      .then((data) => {
+        setWebhookEventTypes(data.webhook);
+        console.log("Success:", data);
+      });
+  };
+
   useEffect(() => {
     getWebhooks();
+    getEventTypes();
   }, []);
 
   if (loading) {
     return <Loader />;
   }
 
-  const createWebhook = () => {};
+  const createWebhook = () => {
+    const webhook = {
+      subscriberUrl: subUrlRef,
+      eventTriggers: webhookEventTrigger,
+      eventTypes: webhookEventTypes,
+    };
+    fetch("/api/webhook", { method: "POST", body: JSON.stringify(webhook) })
+      .then(getWebhooks)
+      .catch(console.log);
+  };
 
   return (
     <Shell
@@ -174,7 +188,7 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
                 {!!webhooks.length && (
                   <WebhookList
                     webhooks={webhooks}
-                    webhookEventTypes={webhookEventTypes}
+                    // webhookEventTypes={webhookEventTypes}
                     onChange={getWebhooks}></WebhookList>
                 )}
               </div>
