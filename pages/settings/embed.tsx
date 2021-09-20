@@ -10,7 +10,7 @@ import Button from "@components/ui/Button";
 import { useEffect, useState, useRef } from "react";
 import { PlusIcon, ShareIcon } from "@heroicons/react/outline";
 import WebhookList from "@components/webhook/WebhookList";
-import Checkbox from "@components/ui/form/checkbox";
+import Switch from "@components/ui/Switch";
 
 export default function Embed(props: { err: string | undefined; BASE_URL: string; user: Member }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -250,27 +250,33 @@ export default function Embed(props: { err: string | undefined; BASE_URL: string
                         {" "}
                         Select Event Triggers{" "}
                       </legend>
-                      <Checkbox
-                        defaultChecked={true}
-                        cid="booking-created"
-                        label="Booking Created"
-                        value={bookingCreated}
-                        onCheckedChange={onCheckedChange}
-                      />
-                      <Checkbox
-                        defaultChecked={true}
-                        cid="booking-rescheduled"
-                        label="Booking Rescheduled"
-                        value={bookingRescheduled}
-                        onCheckedChange={onCheckedChange}
-                      />
-                      <Checkbox
-                        defaultChecked={true}
-                        cid="booking-canceled"
-                        label="Booking Canceled"
-                        value={bookingCanceled}
-                        onCheckedChange={onCheckedChange}
-                      />
+                      <div className="w-2/12 pt-3 text-right">
+                        <Switch
+                          defaultChecked={true}
+                          cid="booking-created"
+                          label="Booking Created"
+                          value={bookingCreated}
+                          onCheckedChange={onCheckedChange}
+                        />
+                      </div>
+                      <div className="w-2/12 pt-3 text-right">
+                        <Switch
+                          defaultChecked={true}
+                          cid="booking-rescheduled"
+                          label="Booking Rescheduled"
+                          value={bookingRescheduled}
+                          onCheckedChange={onCheckedChange}
+                        />
+                      </div>
+                      <div className="w-2/12 pt-3 text-right">
+                        <Switch
+                          defaultChecked={true}
+                          cid="booking-canceled"
+                          label="Booking Canceled"
+                          value={bookingCanceled}
+                          onCheckedChange={onCheckedChange}
+                        />
+                      </div>
                     </div>
                     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                       <Button type="submit" color="primary" className="ml-2">
