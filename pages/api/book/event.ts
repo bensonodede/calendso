@@ -23,6 +23,7 @@ import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
 import dayjsBusinessDays from "dayjs-business-days";
 import EventOrganizerRequestMail from "@lib/emails/EventOrganizerRequestMail";
+import sendPayload from "@lib/webhooks/sendPayload";
 
 dayjs.extend(dayjsBusinessDays);
 dayjs.extend(utc);
@@ -417,6 +418,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   log.debug(`Booking ${user.username} completed`);
+
+  // Send Webhook call if hooked to BOOKING.CREATED
+
+  // TODO:: FETCH THE SUB URL IF EXISTS FOR BOOKING.CREATED FOR THIS USER/EVENT
+  const subscriberUrl = "http://mockbin.org/bin/27716cd4-e78a-4d5f-9e3f-c83c41229ac0";
+  const resp = await sendPayload("BOOKING.CREATED", new Date().toISOString(), subscriberUrl, evt);
+
+  console.log(resp);
 
   await prisma.booking.update({
     where: {
